@@ -1,0 +1,1549 @@
+<!DOCTYPE html>
+<html lang="id" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IPA INTERACTIVE LEARNING - MTsN 1 KOTA MALANG</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1e3a8a',
+                        secondary: '#06b6d4',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; transition: background-color 0.3s, color 0.3s; }
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        #lab-area { position: relative; width: 100%; height: 400px; background: #f0f9ff; overflow: hidden; border-radius: 0.5rem; user-select: none; }
+        .dark #lab-area { background: #1e293b; }
+        .draggable { position: absolute; cursor: grab; touch-action: none; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        .draggable:active { cursor: grabbing; }
+        
+        #sweater { width: 150px; height: 250px; background: #fbbf24; border-radius: 20px; left: 50px; top: 50px; position: absolute; display: flex; flex-wrap: wrap; align-content: flex-start; padding: 10px; border: 2px solid #b45309; }
+        #wall { width: 100px; height: 100%; background: #9ca3af; right: 0; top: 0; position: absolute; border-left: 4px solid #4b5563; display: flex; flex-direction: column; align-items: center; justify-content: space-around; padding-left: 10px; }
+        #balloon { width: 100px; height: 120px; background: #ef4444; border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%; left: 300px; top: 150px; position: absolute; z-index: 10; box-shadow: inset -10px -10px 20px rgba(0,0,0,0.2); display: flex; flex-wrap: wrap; justify-content: center; align-content: center; }
+        .knot { width: 20px; height: 20px; background: #ef4444; position: absolute; bottom: -15px; left: 40px; clip-path: polygon(50% 0%, 0% 100%, 100% 100%); }
+        
+        .charge { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; font-size: 14px; position: absolute; transition: all 0.3s; }
+        .charge.proton { background: #ef4444; }
+        .charge.electron { background: #3b82f6; }
+        
+        .print-only { display: none; }
+        @media print {
+            body * { visibility: hidden; }
+            #lkpd-section, #lkpd-section * { visibility: visible; }
+            #lkpd-section { position: absolute; left: 0; top: 0; width: 100%; }
+            .no-print { display: none !important; }
+            .print-only { display: block; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-200">
+
+    <nav class="bg-primary text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-primary font-bold text-xl mr-3">IPA</div>
+                        <div>
+                            <h1 class="font-bold text-lg leading-tight">IPA INTERACTIVE LEARNING</h1>
+                            <p class="text-xs text-blue-200">MTsN 1 KOTA MALANG</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="toggleDarkMode()" class="p-2 rounded-md hover:bg-blue-800 transition">
+                        <svg id="theme-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                    </button>
+                    <button class="md:hidden p-2 rounded-md hover:bg-blue-800" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden bg-blue-900 pb-3 px-2">
+            <a href="#" onclick="showSection('beranda')" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-blue-800">Beranda</a>
+            <a href="#" onclick="showSection('materi')" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-blue-800">Materi Listrik Statis</a>
+            <a href="#" onclick="showSection('lab')" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-blue-800">Lab Virtual</a>
+            <a href="#" onclick="showSection('lkpd')" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-blue-800">LKPD</a>
+            <a href="#" onclick="showSection('kuis')" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-blue-800">Kuis</a>
+        </div>
+    </nav>
+
+    <div class="flex max-w-7xl mx-auto">
+        <aside class="hidden md:block w-64 flex-shrink-0 py-8 px-4">
+            <div class="sticky top-24 space-y-2">
+                <button onclick="showSection('beranda')" class="w-full text-left px-4 py-3 rounded-lg font-medium transition nav-btn active-nav bg-blue-100 text-primary dark:bg-gray-800 dark:text-secondary">🏠 Beranda</button>
+                <button onclick="showSection('materi')" class="w-full text-left px-4 py-3 rounded-lg font-medium transition hover:bg-blue-100 hover:text-primary dark:hover:bg-gray-800 dark:hover:text-secondary nav-btn">📖 Materi Pembelajaran</button>
+                <button onclick="showSection('lab')" class="w-full text-left px-4 py-3 rounded-lg font-medium transition hover:bg-blue-100 hover:text-primary dark:hover:bg-gray-800 dark:hover:text-secondary nav-btn">🧪 Lab Virtual (PhET Style)</button>
+                <button onclick="showSection('lkpd')" class="w-full text-left px-4 py-3 rounded-lg font-medium transition hover:bg-blue-100 hover:text-primary dark:hover:bg-gray-800 dark:hover:text-secondary nav-btn">📝 LKPD Digital</button>
+                <button onclick="showSection('kuis')" class="w-full text-left px-4 py-3 rounded-lg font-medium transition hover:bg-blue-100 hover:text-primary dark:hover:bg-gray-800 dark:hover:text-secondary nav-btn">🎯 Kuis Interaktif</button>
+            </div>
+        </aside>
+
+        <main class="flex-1 py-8 px-4 sm:px-6 lg:px-8 max-w-4xl">
+            <section id="beranda" class="fade-in block">
+                <div class="bg-gradient-to-r from-primary to-blue-700 rounded-2xl p-8 text-white shadow-xl mb-8">
+                    <h2 class="text-3xl font-bold mb-2">Selamat Datang di Portal Belajar IPA</h2>
+                    <p class="text-blue-100 mb-6">Materi: Listrik Statis (Kelas IX)</p>
+                    <div class="flex items-center text-sm bg-white/20 inline-block px-4 py-2 rounded-full">
+                        Disusun oleh: <span class="font-bold ml-1">Mohamad Kholish Widodo, S.Pd., M.Pd.</span>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-100 dark:border-gray-700 mb-8">
+                    <h3 class="text-xl font-bold text-primary dark:text-secondary mb-4 flex items-center">
+                        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                        Daftar Hadir Siswa
+                    </h3>
+                    <form id="form-presensi" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Tanggal</label>
+                                <input type="date" id="presensi-tanggal" class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-secondary outline-none" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Kelas</label>
+                                <select id="presensi-kelas" class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-secondary outline-none" required onchange="updateDaftarNama()">
+                                    <option value="">-- Pilih Kelas --</option>
+                                    <option value="9E">9E</option>
+                                    <option value="9G">9G</option>
+                                    <option value="9J">9J</option>
+                                    <option value="9K">9K</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Nama Siswa</label>
+                                <select id="presensi-nama" class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-secondary outline-none" required disabled>
+                                    <option value="">-- Pilih Nama --</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Status Kehadiran</label>
+                            <div class="flex flex-wrap gap-4">
+                                <label class="flex items-center space-x-2 cursor-pointer bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300 px-3 py-2 rounded-lg border border-green-200 dark:border-green-800">
+                                    <input type="radio" name="status-hadir" value="Hadir" required class="text-green-600"> <span>Hadir</span>
+                                </label>
+                                <label class="flex items-center space-x-2 cursor-pointer bg-yellow-50 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300 px-3 py-2 rounded-lg border border-yellow-200 dark:border-yellow-800">
+                                    <input type="radio" name="status-hadir" value="Sakit" class="text-yellow-600"> <span>Sakit</span>
+                                </label>
+                                <label class="flex items-center space-x-2 cursor-pointer bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 px-3 py-2 rounded-lg border border-blue-200 dark:border-blue-800">
+                                    <input type="radio" name="status-hadir" value="Izin" class="text-blue-600"> <span>Izin</span>
+                                </label>
+                                <label class="flex items-center space-x-2 cursor-pointer bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300 px-3 py-2 rounded-lg border border-red-200 dark:border-red-800">
+                                    <input type="radio" name="status-hadir" value="Alpa" class="text-red-600"> <span>Alpa</span>
+                                </label>
+                                <label class="flex items-center space-x-2 cursor-pointer bg-purple-50 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 px-3 py-2 rounded-lg border border-purple-200 dark:border-purple-800">
+                                    <input type="radio" name="status-hadir" value="Dispensasi" class="text-purple-600"> <span>Dispensasi</span>
+                                </label>
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full bg-secondary hover:bg-cyan-600 text-white font-bold py-3 px-4 rounded-lg transition mt-4">
+                            Simpan Kehadiran
+                        </button>
+                    </form>
+                    
+                    <div id="alert-presensi" class="hidden mt-4 p-3 bg-green-100 text-green-800 border border-green-300 rounded-lg flex items-center justify-between">
+                        <span>✅ Presensi berhasil disimpan!</span>
+                        <button onclick="document.getElementById('alert-presensi').classList.add('hidden')">✖</button>
+                    </div>
+
+                    <!-- Tombol Lihat Rekap -->
+                    <button onclick="showRekap()" class="mt-4 w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-lg border border-gray-300 transition dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600">
+                        Lihat Rekap Kehadiran
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow hover:shadow-md transition border-t-4 border-secondary">
+                        <div class="w-12 h-12 bg-blue-100 text-primary rounded-lg flex items-center justify-center mb-4 text-2xl">📖</div>
+                        <h3 class="text-xl font-bold mb-2">Materi Digital</h3>
+                        <p class="text-gray-600 dark:text-gray-400 mb-4 text-sm">Pelajari konsep listrik statis, gejala, perpindahan elektron, dan Hukum Coulomb.</p>
+                        <button onclick="showSection('materi')" class="text-secondary font-medium hover:underline">Mulai Belajar &rarr;</button>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow hover:shadow-md transition border-t-4 border-purple-500">
+                        <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center mb-4 text-2xl">🧪</div>
+                        <h3 class="text-xl font-bold mb-2">Lab Virtual</h3>
+                        <p class="text-gray-600 dark:text-gray-400 mb-4 text-sm">Simulasi interaktif listrik statis (Balon, Sweater, dan Dinding) gaya PhET.</p>
+                        <button onclick="showSection('lab')" class="text-purple-500 font-medium hover:underline">Coba Simulasi &rarr;</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="materi" class="fade-in hidden">
+                <div class="mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+                    <h2 class="text-3xl font-bold text-primary dark:text-secondary">Listrik Statis</h2>
+                    <p class="text-gray-600 dark:text-gray-400 mt-2">Ringkasan Materi Bab 5: Ilmu Pengetahuan Alam Kelas IX</p>
+                </div>
+
+                <div class="space-y-8 text-lg leading-relaxed">
+                    <!-- PENDAHULUAN -->
+                    <div class="bg-gradient-to-br from-blue-50 to-white dark:from-blue-900/30 dark:to-gray-800 p-6 rounded-xl border border-blue-200 dark:border-blue-800 shadow-sm">
+                        <h3 class="text-2xl font-bold text-primary dark:text-secondary mb-4">Siap-Siap Belajar</h3>
+                        <p class="mb-3 text-justify">Di sekitar kita, listrik dan magnet memegang peran yang sangat penting, mulai dari menyalakan lampu, menggerakkan kipas angin, hingga menempelkan hiasan di pintu kulkas. Bahkan di masa depan, energi alternatif semakin digalakkan untuk menjaga kelestarian bumi.</p>
+                        
+                        <div class="mt-6 bg-white dark:bg-gray-700 p-5 rounded-lg shadow-inner">
+                            <p class="font-bold text-gray-800 dark:text-gray-200 mb-3">Mari renungkan sejenak pertanyaan-pertanyaan berikut sebelum kita mulai:</p>
+                            <ul class="list-disc pl-5 space-y-2 text-base text-gray-700 dark:text-gray-300">
+                                <li>Apa saja alat di rumahmu yang tidak bisa hidup tanpa listrik?</li>
+                                <li>Pernahkah kamu tersengat listrik? Bagaimana rasanya dan mengapa itu bisa terjadi?</li>
+                                <li>Apakah semua benda bisa menghantarkan listrik?</li>
+                                <li>Apa yang terjadi jika dua kutub magnet saling didekatkan?</li>
+                                <li>Jika kamu bisa memilih satu sumber energi alternatif untuk desamu (seperti matahari atau angin), apa yang akan kamu pilih?</li>
+                            </ul>
+                            <p class="mt-4 font-semibold text-secondary text-sm italic">Simpan jawabanmu, mari kita temukan fakta sainsnya di materi ini!</p>
+                        </div>
+                    </div>
+
+                    <!-- SUBBAB 1: LISTRIK STATIS -->
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4 flex items-center text-primary dark:text-secondary">
+                            <span class="bg-blue-100 text-primary w-10 h-10 rounded-full flex items-center justify-center mr-3 text-lg border-2 border-primary">1</span> 
+                            Listrik Statis
+                        </h3>
+                        
+                        <div class="flex flex-col md:flex-row gap-6 mb-4 items-center">
+                            <div class="flex-1">
+                                <p class="mb-3 text-justify"><strong>Listrik Statis</strong> adalah fenomena berkumpulnya muatan listrik pada suatu benda akibat perpindahan elektron.</p>
+                                <p class="mb-3 text-justify">Pernahkah kamu menggosokkan sisir plastik ke rambut kering, lalu sisir itu bisa menarik potongan kertas kecil? Hal itu terjadi karena gesekan menyebabkan <strong>elektron berpindah</strong> dari rambut ke sisir. Sisir yang kelebihan elektron kini bermuatan negatif dan mampu menarik benda netral atau positif.</p>
+                                
+                                <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800 text-base mt-4">
+                                    <strong>Aturan Interaksi Muatan:</strong>
+                                    <ul class="list-disc pl-5 mt-1 space-y-1">
+                                        <li>Muatan <strong>sejenis</strong> ( + dan + / - dan - ) akan <strong>tolak-menolak</strong>.</li>
+                                        <li>Muatan <strong>berbeda jenis</strong> ( + dan - ) akan <strong>tarik-menarik</strong>.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="w-full md:w-1/3">
+                                <!-- Ilustrasi Sisir & Kertas dengan SVG -->
+                                <svg viewBox="0 0 300 250" class="w-full h-auto bg-white dark:bg-gray-700 rounded-lg shadow-md border border-gray-200 dark:border-gray-600">
+                                    <!-- Rambut/Kertas -->
+                                    <path d="M 120 200 L 140 160 L 160 210 Z" fill="#e5e7eb" />
+                                    <path d="M 170 210 L 180 150 L 190 200 Z" fill="#e5e7eb" />
+                                    <path d="M 210 220 L 220 165 L 230 215 Z" fill="#e5e7eb" />
+                                    <!-- Muatan positif pada kertas -->
+                                    <text x="135" y="190" fill="#ef4444" font-weight="bold" font-size="14">+</text>
+                                    <text x="175" y="190" fill="#ef4444" font-weight="bold" font-size="14">+</text>
+                                    <text x="215" y="200" fill="#ef4444" font-weight="bold" font-size="14">+</text>
+                                    
+                                    <!-- Sisir -->
+                                    <rect x="80" y="80" width="180" height="30" fill="#3b82f6" rx="5" transform="rotate(-15 170 95)" />
+                                    <g fill="#1e3a8a" transform="rotate(-15 170 95)">
+                                        <rect x="90" y="110" width="6" height="25" rx="2" />
+                                        <rect x="110" y="110" width="6" height="25" rx="2" />
+                                        <rect x="130" y="110" width="6" height="25" rx="2" />
+                                        <rect x="150" y="110" width="6" height="25" rx="2" />
+                                        <rect x="170" y="110" width="6" height="25" rx="2" />
+                                        <rect x="190" y="110" width="6" height="25" rx="2" />
+                                        <rect x="210" y="110" width="6" height="25" rx="2" />
+                                        <rect x="230" y="110" width="6" height="25" rx="2" />
+                                    </g>
+                                    <!-- Muatan negatif sisir -->
+                                    <text x="120" y="90" fill="white" font-weight="bold" font-size="24">-</text>
+                                    <text x="180" y="75" fill="white" font-weight="bold" font-size="24">-</text>
+                                    <!-- Garis gaya tarik -->
+                                    <path d="M 140 150 Q 150 130 145 110" fill="none" stroke="#9ca3af" stroke-dasharray="4" stroke-width="2"/>
+                                    <path d="M 180 140 Q 185 120 180 100" fill="none" stroke="#9ca3af" stroke-dasharray="4" stroke-width="2"/>
+                                </svg>
+                                <p class="text-xs text-center mt-2 text-gray-500">Gambar 5.1 Sisir plastik bermuatan menarik kertas</p>
+                            </div>
+                        </div>
+
+                        <h4 class="text-xl font-bold mb-2">Alat Pendeteksi: Elektroskop</h4>
+                        <div class="flex flex-col md:flex-row-reverse gap-6 items-center">
+                            <div class="flex-1">
+                                <p class="text-justify mb-3">Untuk mengetahui apakah sebuah benda memiliki muatan listrik, ilmuwan menggunakan alat bernama <strong>Elektroskop</strong>.</p>
+                                <p class="text-justify">Jika benda bermuatan didekatkan ke kepala elektroskop, muatan akan terinduksi turun ke bagian daun (foil) di bawah. Karena kedua daun menerima muatan yang sejenis, daun tersebut akan <strong>mekar (saling tolak-menolak)</strong>.</p>
+                            </div>
+                            <div class="w-full md:w-1/3">
+                                <!-- Ilustrasi Elektroskop -->
+                                <svg viewBox="0 0 300 300" class="w-full h-auto bg-gray-50 dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-600">
+                                    <!-- Tabung Kaca -->
+                                    <path d="M 80 100 L 220 100 L 240 280 L 60 280 Z" fill="rgba(255,255,255,0.5)" stroke="#9ca3af" stroke-width="4"/>
+                                    <!-- Tutup Karet -->
+                                    <rect x="110" y="85" width="80" height="15" fill="#4b5563" rx="4"/>
+                                    <!-- Batang Logam -->
+                                    <rect x="146" y="50" width="8" height="160" fill="#d97706"/>
+                                    <circle cx="150" cy="50" r="15" fill="#d97706"/>
+                                    <!-- Daun Elektroskop Mekar -->
+                                    <line x1="150" y1="205" x2="110" y2="250" stroke="#fbbf24" stroke-width="6" stroke-linecap="round"/>
+                                    <line x1="150" y1="205" x2="190" y2="250" stroke="#fbbf24" stroke-width="6" stroke-linecap="round"/>
+                                    <!-- Indikasi Muatan (Misal negatif) -->
+                                    <text x="100" y="260" fill="#ef4444" font-weight="bold" font-size="20">-</text>
+                                    <text x="185" y="260" fill="#ef4444" font-weight="bold" font-size="20">-</text>
+                                    
+                                    <!-- Batang Penggosok Didekatkan -->
+                                    <rect x="40" y="10" width="100" height="15" fill="#ef4444" rx="5" transform="rotate(-20 40 10)"/>
+                                    <text x="55" y="20" fill="white" font-weight="bold" font-size="16" transform="rotate(-20 40 10)">- - - -</text>
+                                    
+                                    <path d="M 115 35 Q 130 35 140 40" fill="none" stroke="#ef4444" stroke-width="2" marker-end="url(#arrowhead)"/>
+                                    <defs>
+                                        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                                            <polygon points="0 0, 10 3.5, 0 7" fill="#ef4444" />
+                                        </marker>
+                                    </defs>
+                                </svg>
+                                <p class="text-xs text-center mt-2 text-gray-500">Gambar 5.2 Elektroskop Sederhana</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SUBBAB 2: GAYA LISTRIK -->
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4 flex items-center text-primary dark:text-secondary">
+                            <span class="bg-blue-100 text-primary w-10 h-10 rounded-full flex items-center justify-center mr-3 text-lg border-2 border-primary">2</span> 
+                            Gaya Coulomb
+                        </h3>
+                        <p class="mb-4 text-justify">Ilmuwan Prancis, <strong>Charles Augustin de Coulomb (1785)</strong>, mengukur seberapa kuat gaya tarik atau tolak antara dua muatan menggunakan alat <em>neraca puntir</em>. Ia menemukan Hukum Coulomb yang berbunyi:</p>
+                        
+                        <blockquote class="border-l-4 border-secondary pl-4 text-gray-700 dark:text-gray-300 italic mb-4">
+                            "Besar gaya tarik/tolak antara dua benda bermuatan berbanding lurus dengan besar muatannya, dan berbanding terbalik dengan kuadrat jaraknya."
+                        </blockquote>
+
+                        <div class="flex flex-col md:flex-row items-center justify-center gap-6 my-6">
+                            <div class="bg-gray-100 dark:bg-gray-800 p-6 rounded-xl shadow-inner border border-gray-300 dark:border-gray-700 flex-1">
+                                <h4 class="font-bold text-center text-gray-600 dark:text-gray-400 mb-3">Rumus Gaya Coulomb</h4>
+                                <div class="font-serif text-3xl mb-4 text-center text-primary dark:text-secondary">
+                                    F<sub>c</sub> = k &times; <frac class="inline-block align-middle text-center"><span class="block border-b-2 border-current px-2">q<sub>1</sub> &times; q<sub>2</sub></span><span class="block">r<sup>2</sup></span></frac>
+                                </div>
+                                <div class="text-sm">
+                                    <ul class="space-y-1">
+                                        <li><strong>F<sub>c</sub></strong> : Gaya interaksi (Newton)</li>
+                                        <li><strong>k</strong> : Konstanta (9 &times; 10<sup>9</sup> Nm<sup>2</sup>/C<sup>2</sup>)</li>
+                                        <li><strong>q<sub>1</sub>, q<sub>2</sub></strong> : Besar muatan (Coulomb)</li>
+                                        <li><strong>r</strong> : Jarak antar muatan (meter)</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <!-- Ilustrasi Hukum Coulomb SVG -->
+                            <div class="flex-1 w-full max-w-sm">
+                                <svg viewBox="0 0 400 200" class="w-full h-auto">
+                                    <!-- Muatan 1 -->
+                                    <circle cx="100" cy="100" r="30" fill="#ef4444"/>
+                                    <text x="100" y="108" fill="white" font-weight="bold" font-size="24" text-anchor="middle">+</text>
+                                    <text x="100" y="150" fill="#4b5563" font-weight="bold" text-anchor="middle">q1</text>
+                                    
+                                    <!-- Muatan 2 -->
+                                    <circle cx="300" cy="100" r="30" fill="#3b82f6"/>
+                                    <text x="300" y="105" fill="white" font-weight="bold" font-size="24" text-anchor="middle">-</text>
+                                    <text x="300" y="150" fill="#4b5563" font-weight="bold" text-anchor="middle">q2</text>
+                                    
+                                    <!-- Jarak r -->
+                                    <line x1="100" y1="170" x2="300" y2="170" stroke="#9ca3af" stroke-width="2" stroke-dasharray="5"/>
+                                    <line x1="100" y1="165" x2="100" y2="175" stroke="#9ca3af" stroke-width="2"/>
+                                    <line x1="300" y1="165" x2="300" y2="175" stroke="#9ca3af" stroke-width="2"/>
+                                    <text x="200" y="190" fill="#4b5563" font-weight="bold" font-style="italic" text-anchor="middle">r (Jarak)</text>
+
+                                    <!-- Gaya (Tarik Menarik) -->
+                                    <line x1="140" y1="100" x2="180" y2="100" stroke="#ef4444" stroke-width="4" marker-end="url(#arrow-red)"/>
+                                    <text x="160" y="90" fill="#ef4444" font-weight="bold" text-anchor="middle">F</text>
+                                    
+                                    <line x1="260" y1="100" x2="220" y2="100" stroke="#3b82f6" stroke-width="4" marker-end="url(#arrow-blue)"/>
+                                    <text x="240" y="90" fill="#3b82f6" font-weight="bold" text-anchor="middle">F</text>
+
+                                    <defs>
+                                        <marker id="arrow-red" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#ef4444" /></marker>
+                                        <marker id="arrow-blue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#3b82f6" /></marker>
+                                    </defs>
+                                </svg>
+                                <p class="text-xs text-center mt-2 text-gray-500">Gambar 5.3 Interaksi Tarik-menarik Hukum Coulomb</p>
+                            </div>
+                        </div>
+                        <p class="text-justify mb-4">Intinya: <strong>Semakin besar muatannya, tarikannya semakin kuat. Tapi semakin jauh jaraknya, gaya tarik/tolaknya akan melemah dengan sangat cepat (kuadrat jarak).</strong></p>
+                    </div>
+
+                    <!-- SUBBAB 3: MEDAN LISTRIK -->
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4 flex items-center text-primary dark:text-secondary">
+                            <span class="bg-blue-100 text-primary w-10 h-10 rounded-full flex items-center justify-center mr-3 text-lg border-2 border-primary">3</span> 
+                            Medan Listrik
+                        </h3>
+                        <p class="mb-4 text-justify">Sama seperti bumi yang punya gravitasi, muatan listrik juga punya area di sekitarnya yang disebut <strong>Medan Listrik</strong>. Jika ada muatan lain yang masuk ke area ini, ia akan merasakan gaya listrik.</p>
+                        
+                        <div class="flex flex-col md:flex-row gap-6 mb-6">
+                            <div class="flex-1 text-center bg-gray-50 dark:bg-gray-800 p-4 rounded-xl border border-gray-200">
+                                <h4 class="font-bold mb-2">Garis Gaya Medan Listrik</h4>
+                                <!-- SVG Medan Listrik -->
+                                <svg viewBox="0 0 500 200" class="w-full h-auto">
+                                    <!-- Muatan Positif -->
+                                    <circle cx="150" cy="100" r="25" fill="#ef4444"/>
+                                    <text x="150" y="108" fill="white" font-weight="bold" font-size="24" text-anchor="middle">+</text>
+                                    <!-- Panah Keluar (Positif) -->
+                                    <g stroke="#ef4444" stroke-width="2" marker-end="url(#arrow-red)">
+                                        <line x1="180" y1="100" x2="220" y2="100"/>
+                                        <line x1="120" y1="100" x2="80" y2="100"/>
+                                        <line x1="150" y1="70" x2="150" y2="30"/>
+                                        <line x1="150" y1="130" x2="150" y2="170"/>
+                                        <line x1="171" y1="79" x2="200" y2="50"/>
+                                        <line x1="129" y1="121" x2="100" y2="150"/>
+                                        <line x1="171" y1="121" x2="200" y2="150"/>
+                                        <line x1="129" y1="79" x2="100" y2="50"/>
+                                    </g>
+                                    
+                                    <!-- Muatan Negatif -->
+                                    <circle cx="350" cy="100" r="25" fill="#3b82f6"/>
+                                    <text x="350" y="105" fill="white" font-weight="bold" font-size="28" text-anchor="middle">-</text>
+                                    <!-- Panah Masuk (Negatif) -->
+                                    <g stroke="#3b82f6" stroke-width="2" marker-end="url(#arrow-blue)">
+                                        <line x1="400" y1="100" x2="385" y2="100"/> <line x1="420" y1="100" x2="400" y2="100"/>
+                                        <line x1="300" y1="100" x2="315" y2="100"/> <line x1="280" y1="100" x2="300" y2="100"/>
+                                        <line x1="350" y1="50" x2="350" y2="65"/>   <line x1="350" y1="30" x2="350" y2="50"/>
+                                        <line x1="350" y1="150" x2="350" y2="135"/> <line x1="350" y1="170" x2="350" y2="150"/>
+                                    </g>
+                                    <text x="150" y="195" fill="#6b7280" font-size="12" text-anchor="middle">Arah Keluar (+)</text>
+                                    <text x="350" y="195" fill="#6b7280" font-size="12" text-anchor="middle">Arah Masuk (-)</text>
+                                </svg>
+                            </div>
+                            <div class="flex-1 flex flex-col justify-center">
+                                <p class="mb-3 text-justify">Garis medan listrik digambarkan <strong>keluar dari muatan positif</strong> dan <strong>masuk ke muatan negatif</strong>.</p>
+                                <p class="mb-3 text-justify">Semakin rapat garis-garis tersebut, semakin kuat medan listriknya. Kuat medan listrik (E) dirumuskan:</p>
+                                <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded text-center font-serif text-2xl text-primary dark:text-secondary">
+                                    E = k &times; <frac class="inline-block align-middle text-center"><span class="block border-b-2 border-current px-2">Q</span><span class="block">r<sup>2</sup></span></frac>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SUBBAB 4: POTENSIAL LISTRIK -->
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4 flex items-center text-primary dark:text-secondary">
+                            <span class="bg-blue-100 text-primary w-10 h-10 rounded-full flex items-center justify-center mr-3 text-lg border-2 border-primary">4</span> 
+                            Potensial Listrik & Biolistrik
+                        </h3>
+                        <p class="mb-4 text-justify">Tersetrum terjadi karena adanya perbedaan tegangan (Beda Potensial). Beda potensial adalah energi yang dibutuhkan untuk memindahkan muatan listrik dari satu titik ke titik lain.</p>
+                        
+                        <h4 class="text-xl font-bold mt-6 mb-2 text-primary">Biolistrik pada Tubuh Manusia</h4>
+                        <p class="mb-4 text-justify">Tahukah kamu bahwa tubuh kita juga menghasilkan listrik? Ini disebut <strong>Biolistrik</strong>. Namun, listrik di tubuh kita bukan mengalir lewat kabel logam seperti di rumah, melainkan melalui <strong>sistem saraf</strong> menggunakan perpindahan ion (seperti ion Natrium Na<sup>+</sup> dan Kalium K<sup>+</sup>).</p>
+
+                        <div class="bg-white dark:bg-gray-800 p-4 rounded-xl border border-purple-200 dark:border-purple-800 shadow-md">
+                            <!-- Ilustrasi Neuron (Biolistrik) SVG -->
+                            <svg viewBox="0 0 800 300" class="w-full h-auto mb-2">
+                                <!-- Dendrit -->
+                                <path d="M 120 150 L 50 100 M 120 150 L 50 200 M 120 150 L 80 50 M 120 150 L 80 250 M 120 150 L 150 70 M 120 150 L 150 230" stroke="#9333ea" stroke-width="4" stroke-linecap="round"/>
+                                <!-- Badan Sel -->
+                                <circle cx="120" cy="150" r="40" fill="#d8b4fe" stroke="#9333ea" stroke-width="4"/>
+                                <circle cx="120" cy="150" r="10" fill="#6b21a8"/> <!-- Inti sel -->
+                                <text x="120" y="210" fill="#4b5563" font-weight="bold" text-anchor="middle">Badan Sel & Dendrit</text>
+
+                                <!-- Akson -->
+                                <line x1="160" y1="150" x2="650" y2="150" stroke="#d8b4fe" stroke-width="12"/>
+                                
+                                <!-- Selubung Myelin -->
+                                <rect x="220" y="135" width="80" height="30" fill="#fde047" rx="10" stroke="#ca8a04" stroke-width="2"/>
+                                <rect x="330" y="135" width="80" height="30" fill="#fde047" rx="10" stroke="#ca8a04" stroke-width="2"/>
+                                <rect x="440" y="135" width="80" height="30" fill="#fde047" rx="10" stroke="#ca8a04" stroke-width="2"/>
+                                <rect x="550" y="135" width="80" height="30" fill="#fde047" rx="10" stroke="#ca8a04" stroke-width="2"/>
+                                <text x="480" y="190" fill="#4b5563" font-weight="bold" text-anchor="middle">Selubung Myelin (Isolator)</text>
+
+                                <!-- Ion Na+ mengalir (Impuls Listrik) -->
+                                <circle cx="315" cy="120" r="12" fill="#ef4444"/> <text x="315" y="124" fill="white" font-size="10" font-weight="bold" text-anchor="middle">Na+</text>
+                                <path d="M 315 135 L 315 160" stroke="#ef4444" stroke-width="2" marker-end="url(#arrow-red)"/>
+                                
+                                <circle cx="425" cy="120" r="12" fill="#ef4444"/> <text x="425" y="124" fill="white" font-size="10" font-weight="bold" text-anchor="middle">Na+</text>
+                                <path d="M 425 135 L 425 160" stroke="#ef4444" stroke-width="2" marker-end="url(#arrow-red)"/>
+
+                                <!-- Arah impuls -->
+                                <path d="M 200 90 L 600 90" stroke="#10b981" stroke-width="4" stroke-dasharray="10" marker-end="url(#arrow-green)"/>
+                                <text x="400" y="80" fill="#10b981" font-weight="bold" text-anchor="middle">Arah Aliran Impuls (Tegangan Aksi)</text>
+
+                                <!-- Terminal Akson -->
+                                <path d="M 650 150 L 720 100 M 650 150 L 740 150 M 650 150 L 720 200" stroke="#9333ea" stroke-width="4" stroke-linecap="round"/>
+                                <circle cx="720" cy="100" r="8" fill="#9333ea"/>
+                                <circle cx="740" cy="150" r="8" fill="#9333ea"/>
+                                <circle cx="720" cy="200" r="8" fill="#9333ea"/>
+
+                                <defs>
+                                    <marker id="arrow-green" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#10b981" /></marker>
+                                </defs>
+                            </svg>
+                            <p class="text-xs text-center text-gray-500">Gambar 5.4 Anatomi Sel Saraf (Neuron) dan aliran impuls ion Na+</p>
+                        </div>
+
+                        <p class="mt-4 text-justify">Sistem saraf berfungsi menerima, mengolah, dan mengirim rangsangan (impuls) dari panca indra. Bagian yang disebut <strong>Myelin</strong> mempercepat jalannya listrik pada saraf. Jika kita menyentuh air panas, impuls listrik ini langsung berjalan kilat ke otak untuk memberi perintah menarik tangan.</p>
+                    </div>
+
+                </div>
+            </section>
+
+            <section id="lab" class="fade-in hidden">
+                <div class="mb-6">
+                    <h2 class="text-3xl font-bold text-primary dark:text-secondary mb-2">Lab Virtual Listrik Statis</h2>
+                    <p class="text-gray-600 dark:text-gray-400">Pilih simulasi interaktif di bawah ini untuk mempelajari gejala listrik statis dan Gaya Coulomb!</p>
+                </div>
+
+                <!-- Tab Navigasi Lab -->
+                <div class="flex space-x-2 mb-4 border-b border-gray-300 dark:border-gray-600">
+                    <button id="tab-balon" onclick="switchLab('balon')" class="bg-secondary text-white font-bold px-4 py-2 rounded-t-lg transition">Balon & Sweater</button>
+                    <button id="tab-coulomb" onclick="switchLab('coulomb')" class="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 font-bold px-4 py-2 rounded-t-lg transition">Hukum Coulomb</button>
+                </div>
+
+                <!-- LAB 1: Balon & Sweater -->
+                <div id="lab-balon-container" class="block">
+                    <div class="bg-white dark:bg-gray-800 p-4 rounded-b-xl rounded-tr-xl shadow-lg border border-gray-200 dark:border-gray-700">
+                        <div id="lab-area">
+                            <div id="sweater">
+                                <div class="absolute -top-6 text-xs font-bold text-gray-800 w-full text-center">Sweater Wol</div>
+                            </div>
+                            
+                            <div id="balloon" class="draggable">
+                                <div class="knot"></div>
+                            </div>
+                            
+                            <div id="wall">
+                                <div class="absolute -top-6 text-xs font-bold text-gray-800 w-full text-center">Dinding</div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 flex justify-between items-center">
+                            <p class="text-sm font-medium" id="lab-status">Status: Balon Netral</p>
+                            <button onclick="resetLab()" class="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 px-4 py-2 rounded-lg text-sm font-bold transition">Reset Simulasi</button>
+                        </div>
+                    </div>
+                    <div class="mt-4 bg-yellow-50 dark:bg-yellow-900/30 p-4 rounded-lg text-sm border border-yellow-200 dark:border-yellow-700">
+                        <strong>Petunjuk:</strong> 
+                        <ol class="list-decimal pl-4 mt-2">
+                            <li>Perhatikan bahwa awalnya Sweater dan Balon bersifat <strong>Netral</strong> (jumlah tanda + dan - seimbang/berpasangan).</li>
+                            <li>Tarik (Drag) balon menggunakan mouse/jari dan gosokkan ke sweater berulang kali.</li>
+                            <li>Perhatikan tanda (-) berpindah dari sweater ke balon. Balon kini bermuatan negatif.</li>
+                            <li>Tarik balon mendekati dinding. Perhatikan elektron (-) pada dinding menjauh (polarisasi). Balon akan menempel pada dinding karena ditarik oleh proton (+) dinding.</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <!-- LAB 2: Hukum Coulomb -->
+                <div id="lab-coulomb-container" class="hidden">
+                    <div class="bg-white dark:bg-gray-800 p-4 rounded-b-xl rounded-tr-xl shadow-lg border border-gray-200 dark:border-gray-700">
+                        
+                        <div class="relative w-full h-[250px] bg-[#f0f9ff] dark:bg-[#1e293b] rounded-lg overflow-hidden flex items-center border border-gray-300 dark:border-gray-600">
+                            <!-- Garis Jarak (r) -->
+                            <div class="absolute border-b-2 border-dashed border-gray-400 h-1 transition-all duration-300" id="coulomb-distance-line" style="top: 50%;"></div>
+                            <span class="absolute top-[55%] left-[50%] -translate-x-1/2 text-sm font-bold text-gray-600 dark:text-gray-300" id="coulomb-r-label"></span>
+                            
+                            <!-- Q1 & Arrow -->
+                            <div id="coulomb-q1-container" class="absolute flex items-center transition-all duration-300" style="top: calc(50% - 24px);">
+                                <div id="f1-arrow-left" class="hidden text-2xl mr-2 font-bold text-red-600">←</div>
+                                <div id="coulomb-q1" class="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold shadow-lg z-10 text-sm">q1</div>
+                                <div id="f1-arrow-right" class="hidden text-2xl ml-2 font-bold text-red-600">→</div>
+                            </div>
+                            
+                            <!-- Q2 & Arrow -->
+                            <div id="coulomb-q2-container" class="absolute flex items-center transition-all duration-300" style="top: calc(50% - 24px);">
+                                <div id="f2-arrow-left" class="hidden text-2xl mr-2 font-bold text-blue-600">←</div>
+                                <div id="coulomb-q2" class="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold shadow-lg z-10 text-sm">q2</div>
+                                <div id="f2-arrow-right" class="hidden text-2xl ml-2 font-bold text-blue-600">→</div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div>
+                                <label class="block font-bold mb-2">Muatan 1 (q1): <span id="q1-val" class="text-secondary">-4 μC</span></label>
+                                <input type="range" id="q1-slider" min="-10" max="10" value="-4" step="1" class="w-full accent-secondary" oninput="updateCoulomb()">
+                            </div>
+                            <div>
+                                <label class="block font-bold mb-2">Muatan 2 (q2): <span id="q2-val" class="text-secondary">4 μC</span></label>
+                                <input type="range" id="q2-slider" min="-10" max="10" value="4" step="1" class="w-full accent-secondary" oninput="updateCoulomb()">
+                            </div>
+                            <div>
+                                <label class="block font-bold mb-2">Jarak (r): <span id="r-val" class="text-secondary">4 cm</span></label>
+                                <input type="range" id="r-slider" min="1" max="8" value="4" step="0.5" class="w-full accent-secondary" oninput="updateCoulomb()">
+                            </div>
+                        </div>
+
+                        <div class="mt-6 p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg text-center border border-blue-200 dark:border-blue-800">
+                            <h4 class="text-lg font-bold">Gaya Coulomb (F) = <span id="coulomb-force" class="text-xl text-primary dark:text-secondary">90.0 N</span></h4>
+                            <p id="coulomb-status" class="mt-2 font-medium">Muatan berbeda jenis, saling Tarik-menarik.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="lkpd" class="fade-in hidden">
+                <div id="lkpd-section" class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 relative">
+                    <div class="text-center mb-6">
+                        <h2 class="text-2xl font-bold text-primary dark:text-secondary uppercase">Lembar Kerja Peserta Didik (LKPD)</h2>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-bold mb-1">Kelas:</label>
+                            <select id="lkpd-kelas" class="w-full p-2 border-b-2 border-gray-300 dark:border-gray-600 bg-transparent outline-none focus:border-secondary" onchange="updateLKPDKelas()">
+                                <option value="">-- Pilih Kelas --</option>
+                                <option value="9E">9E</option>
+                                <option value="9G">9G</option>
+                                <option value="9J">9J</option>
+                                <option value="9K">9K</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Anggota 1 -->
+                        <div>
+                            <label class="block text-sm font-bold mb-1">Anggota 1:</label>
+                            <div class="flex gap-2">
+                                <select id="lkpd-nama-1" class="flex-1 p-2 border-b-2 border-gray-300 dark:border-gray-600 bg-transparent outline-none focus:border-secondary" disabled onchange="updateNoPresensi(1)"></select>
+                                <input type="text" id="lkpd-no-1" placeholder="No" class="w-12 p-2 border-b-2 border-gray-300 dark:border-gray-600 bg-transparent outline-none text-center" readonly title="Nomor Presensi">
+                            </div>
+                        </div>
+                        <!-- Anggota 2 -->
+                        <div>
+                            <label class="block text-sm font-bold mb-1">Anggota 2:</label>
+                            <div class="flex gap-2">
+                                <select id="lkpd-nama-2" class="flex-1 p-2 border-b-2 border-gray-300 dark:border-gray-600 bg-transparent outline-none focus:border-secondary" disabled onchange="updateNoPresensi(2)"></select>
+                                <input type="text" id="lkpd-no-2" placeholder="No" class="w-12 p-2 border-b-2 border-gray-300 dark:border-gray-600 bg-transparent outline-none text-center" readonly title="Nomor Presensi">
+                            </div>
+                        </div>
+                        <!-- Anggota 3 -->
+                        <div>
+                            <label class="block text-sm font-bold mb-1">Anggota 3:</label>
+                            <div class="flex gap-2">
+                                <select id="lkpd-nama-3" class="flex-1 p-2 border-b-2 border-gray-300 dark:border-gray-600 bg-transparent outline-none focus:border-secondary" disabled onchange="updateNoPresensi(3)"></select>
+                                <input type="text" id="lkpd-no-3" placeholder="No" class="w-12 p-2 border-b-2 border-gray-300 dark:border-gray-600 bg-transparent outline-none text-center" readonly title="Nomor Presensi">
+                            </div>
+                        </div>
+                        <!-- Anggota 4 -->
+                        <div>
+                            <label class="block text-sm font-bold mb-1">Anggota 4:</label>
+                            <div class="flex gap-2">
+                                <select id="lkpd-nama-4" class="flex-1 p-2 border-b-2 border-gray-300 dark:border-gray-600 bg-transparent outline-none focus:border-secondary" disabled onchange="updateNoPresensi(4)"></select>
+                                <input type="text" id="lkpd-no-4" placeholder="No" class="w-12 p-2 border-b-2 border-gray-300 dark:border-gray-600 bg-transparent outline-none text-center" readonly title="Nomor Presensi">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab Navigasi LKPD -->
+                    <div class="flex space-x-2 mb-6 border-b border-gray-300 dark:border-gray-600 no-print">
+                        <button id="tab-lkpd-balon" onclick="switchLKPD('balon')" class="bg-secondary text-white font-bold px-4 py-2 rounded-t-lg transition">LKPD 1: Balon & Dinding</button>
+                        <button id="tab-lkpd-coulomb" onclick="switchLKPD('coulomb')" class="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 font-bold px-4 py-2 rounded-t-lg transition">LKPD 2: Hukum Coulomb</button>
+                    </div>
+
+                    <!-- LKPD 1: Balon & Dinding -->
+                    <div id="lkpd-content-balon" class="block space-y-6">
+                        <div class="text-center mb-4">
+                            <h3 class="text-lg font-semibold border-b-2 border-secondary inline-block pb-1">Percobaan Listrik Statis & Polarisasi</h3>
+                        </div>
+                        <div>
+                            <h4 class="font-bold border-b pb-1 mb-2">A. Tujuan</h4>
+                            <p class="text-sm">Menganalisis perpindahan elektron pada benda yang digosok dan mengamati peristiwa induksi/polarisasi muatan listrik.</p>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-bold border-b pb-1 mb-2">B. Tabel Pengamatan</h4>
+                            <table class="w-full text-sm border-collapse border border-gray-400">
+                                <thead class="bg-gray-100 dark:bg-gray-700">
+                                    <tr>
+                                        <th class="border border-gray-400 p-2">Keadaan Benda</th>
+                                        <th class="border border-gray-400 p-2">Muatan Balon</th>
+                                        <th class="border border-gray-400 p-2">Interaksi dengan Dinding</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="border border-gray-400 p-2">Sebelum digosok</td>
+                                        <td class="border border-gray-400 p-2"><input type="text" class="w-full bg-transparent outline-none"></td>
+                                        <td class="border border-gray-400 p-2"><input type="text" class="w-full bg-transparent outline-none"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border border-gray-400 p-2">Setelah digosok ke sweater</td>
+                                        <td class="border border-gray-400 p-2"><input type="text" class="w-full bg-transparent outline-none"></td>
+                                        <td class="border border-gray-400 p-2"><input type="text" class="w-full bg-transparent outline-none"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold border-b pb-1 mb-2">C. Analisis & Kesimpulan</h4>
+                            <p class="text-sm mb-2">1. Mengapa elektron (-) pada dinding menjauh saat didekati balon yang telah digosok?</p>
+                            <textarea class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-transparent outline-none h-16"></textarea>
+                            
+                            <p class="text-sm mt-4 mb-2">2. Tuliskan kesimpulan dari percobaan ini!</p>
+                            <textarea class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-transparent outline-none h-16"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- LKPD 2: Hukum Coulomb -->
+                    <div id="lkpd-content-coulomb" class="hidden space-y-6">
+                        <div class="text-center mb-4">
+                            <h3 class="text-lg font-semibold border-b-2 border-secondary inline-block pb-1">Percobaan Hukum Coulomb</h3>
+                        </div>
+                        <div>
+                            <h4 class="font-bold border-b pb-1 mb-2">A. Tujuan</h4>
+                            <p class="text-sm">Menganalisis hubungan antara besar muatan listrik, jarak antar muatan, dan besar gaya interaksi (Gaya Coulomb).</p>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-bold border-b pb-1 mb-2">B. Tabel Pengamatan</h4>
+                            <table class="w-full text-sm border-collapse border border-gray-400">
+                                <thead class="bg-gray-100 dark:bg-gray-700">
+                                    <tr>
+                                        <th class="border border-gray-400 p-2 w-12 text-center">No</th>
+                                        <th class="border border-gray-400 p-2">Muatan 1 (q1)</th>
+                                        <th class="border border-gray-400 p-2">Muatan 2 (q2)</th>
+                                        <th class="border border-gray-400 p-2">Jarak (r)</th>
+                                        <th class="border border-gray-400 p-2">Besar Gaya (F)</th>
+                                        <th class="border border-gray-400 p-2">Interaksi (Tarik/Tolak)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="border border-gray-400 p-2 text-center font-bold">1</td>
+                                        <td class="border border-gray-400 p-2"><input type="text" class="w-full bg-transparent outline-none text-center"></td>
+                                        <td class="border border-gray-400 p-2"><input type="text" class="w-full bg-transparent outline-none text-center"></td>
+                                        <td class="border border-gray-400 p-2"><input type="text" class="w-full bg-transparent outline-none text-center"></td>
+                                        <td class="border border-gray-400 p-2"><input type="text" class="w-full bg-transparent outline-none text-center"></td>
+                                        <td class="border border-gray-400 p-2"><input type="text" class="w-full bg-transparent outline-none text-center"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border border-gray-400 p-2 text-center font-bold">2</td>
+                                        <td class="border border-gray-400 p-2"><input type="text" class="w-full bg-transparent outline-none text-center"></td>
+                                        <td class="border border-gray-400 p-2"><input type="text" class="w-full bg-transparent outline-none text-center"></td>
+                                        <td class="border border-gray-400 p-2"><input type="text" class="w-full bg-transparent outline-none text-center"></td>
+                                        <td class="border border-gray-400 p-2"><input type="text" class="w-full bg-transparent outline-none text-center"></td>
+                                        <td class="border border-gray-400 p-2"><input type="text" class="w-full bg-transparent outline-none text-center"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border border-gray-400 p-2 text-center font-bold">3</td>
+                                        <td class="border border-gray-400 p-2"><input type="text" class="w-full bg-transparent outline-none text-center"></td>
+                                        <td class="border border-gray-400 p-2"><input type="text" class="w-full bg-transparent outline-none text-center"></td>
+                                        <td class="border border-gray-400 p-2"><input type="text" class="w-full bg-transparent outline-none text-center"></td>
+                                        <td class="border border-gray-400 p-2"><input type="text" class="w-full bg-transparent outline-none text-center"></td>
+                                        <td class="border border-gray-400 p-2"><input type="text" class="w-full bg-transparent outline-none text-center"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold border-b pb-1 mb-2">C. Analisis & Kesimpulan</h4>
+                            <p class="text-sm mb-2">1. Berdasarkan data tabel, apa yang terjadi pada gaya Coulomb (F) jika jarak (r) diperbesar?</p>
+                            <textarea class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-transparent outline-none h-12"></textarea>
+                            
+                            <p class="text-sm mt-4 mb-2">2. Berdasarkan uji coba simulasi, apa syarat agar kedua muatan saling tarik-menarik?</p>
+                            <textarea class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-transparent outline-none h-12"></textarea>
+
+                            <p class="text-sm mt-4 mb-2">3. Tuliskan kesimpulan hubungan antara besar muatan (q), jarak (r), dan besar Gaya (F)!</p>
+                            <textarea class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-transparent outline-none h-16"></textarea>
+                        </div>
+                    </div>
+                    
+                    <button onclick="printLKPD()" class="no-print mt-8 w-full bg-primary hover:bg-blue-800 text-white font-bold py-3 px-4 rounded-lg flex justify-center items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                        Simpan / Cetak PDF
+                    </button>
+                </div>
+            </section>
+
+            <section id="kuis" class="fade-in hidden">
+                <div class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
+                    <h2 class="text-2xl font-bold text-primary dark:text-secondary mb-4">Kuis: Listrik Statis</h2>
+                    
+                    <div id="quiz-intro">
+                        <p class="mb-4">Uji pemahamanmu tentang perpindahan elektron, gaya Coulomb, dan induksi muatan. Kuis terdiri dari 3 soal pilihan ganda.</p>
+                        <button onclick="startQuiz()" class="bg-secondary hover:bg-cyan-600 text-white font-bold py-2 px-6 rounded-lg transition">Mulai Kuis Sekarang</button>
+                    </div>
+
+                    <div id="quiz-play" class="hidden">
+                        <div class="flex justify-between items-center mb-4 text-sm font-bold">
+                            <span id="quiz-progress" class="text-secondary">Soal 1 / 3</span>
+                            <span id="quiz-timer" class="bg-red-100 text-red-600 px-3 py-1 rounded-full">Waktu: 60s</span>
+                        </div>
+                        <h3 id="question-text" class="text-lg font-medium mb-6">Pertanyaan...</h3>
+                        <div id="options-container" class="space-y-3">
+                        </div>
+                    </div>
+
+                    <div id="quiz-result" class="hidden text-center py-6">
+                        <div class="text-6xl mb-4">🏆</div>
+                        <h3 class="text-2xl font-bold mb-2">Kuis Selesai!</h3>
+                        <p class="text-lg mb-6">Skor kamu: <span id="final-score" class="font-bold text-primary text-3xl">0</span> / 100</p>
+                        <button onclick="startQuiz()" class="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-white font-bold py-2 px-6 rounded-lg transition">Ulangi Kuis</button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Modal Rekap Presensi -->
+    <div id="modal-rekap" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center fade-in">
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-2xl w-11/12 max-w-4xl max-h-[90vh] flex flex-col">
+            <div class="flex justify-between items-center mb-4 border-b pb-2 dark:border-gray-700">
+                <h3 class="text-xl font-bold text-primary dark:text-secondary">Rekap Daftar Hadir (Real-Time)</h3>
+                <button onclick="closeRekap()" class="text-gray-500 hover:text-red-500 text-3xl font-bold leading-none">&times;</button>
+            </div>
+            <div class="overflow-y-auto flex-1 mb-4">
+                <table class="w-full text-sm border-collapse border border-gray-300 dark:border-gray-600">
+                    <thead class="bg-gray-100 dark:bg-gray-700 sticky top-0">
+                        <tr>
+                            <th class="border border-gray-300 dark:border-gray-600 p-2">Waktu Input</th>
+                            <th class="border border-gray-300 dark:border-gray-600 p-2">Tanggal</th>
+                            <th class="border border-gray-300 dark:border-gray-600 p-2">Kelas</th>
+                            <th class="border border-gray-300 dark:border-gray-600 p-2 text-left">Nama Siswa</th>
+                            <th class="border border-gray-300 dark:border-gray-600 p-2">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-rekap">
+                        <!-- Data rekap akan masuk ke sini -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="flex justify-end space-x-3 mt-auto pt-4 border-t dark:border-gray-700">
+                <button onclick="clearRekap()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-bold transition">Hapus Semua Data</button>
+                <button onclick="downloadCSV()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-bold transition flex items-center">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    Unduh CSV
+                </button>
+                <button onclick="closeRekap()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg font-bold transition">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modul Penyimpanan Online (Cloud) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        let db, auth;
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+        async function initCloud() {
+            if (typeof __firebase_config === 'undefined') return;
+            const firebaseConfig = JSON.parse(__firebase_config);
+            const app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+
+            try {
+                if (typeof __initial_auth_token !== 'undefined') {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error("Autentikasi gagal:", error);
+            }
+        }
+
+        // Fungsi Simpan ke Cloud
+        window.saveDataOnline = async function(data) {
+            if (!auth || !auth.currentUser) return false;
+            try {
+                const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'presensi');
+                await addDoc(colRef, data);
+                return true;
+            } catch (e) {
+                console.error("Gagal menyimpan:", e);
+                return false;
+            }
+        };
+
+        // Fungsi Ambil Data dari Cloud
+        window.getDataOnline = async function() {
+            if (!auth || !auth.currentUser) return [];
+            try {
+                const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'presensi');
+                const snapshot = await getDocs(colRef);
+                const results = [];
+                snapshot.forEach(doc => {
+                    results.push({ id: doc.id, ...doc.data() });
+                });
+                // Urutkan dari yang terbaru ke terlama berdasarkan timestamp
+                return results.sort((a, b) => b.timestamp - a.timestamp);
+            } catch (e) {
+                console.error("Gagal mengambil data:", e);
+                return [];
+            }
+        };
+
+        // Fungsi Hapus Semua Data dari Cloud
+        window.clearDataOnline = async function() {
+             if (!auth || !auth.currentUser) return false;
+             try {
+                const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'presensi');
+                const snapshot = await getDocs(colRef);
+                const deletePromises = [];
+                snapshot.forEach(document => {
+                    deletePromises.push(deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'presensi', document.id)));
+                });
+                await Promise.all(deletePromises);
+                return true;
+             } catch (e) {
+                 return false;
+             }
+        }
+
+        initCloud();
+    </script>
+
+    <script>
+        const dataSiswa = {
+            "9E": [
+                "AISY SYAHRIL AFZAN", "AFDAN AZ-ZAHRA", "ALYA SALMA RAMADHANI", "ALYA KEISHA GEMILANG", 
+                "BALYA NABILA YESNANA WARDANA", "BEBINA PUTRI SUATMADJA", "BINTA MOHTO SALWAA KHANSAA", 
+                "EVELYN GRISELLA PUTRI SUDARWANTO", "FELA KHANSA SAHIBA", "GELBI MAHIRA RIFAYA AZALEA", 
+                "HASNA KHAIRUNNISA PRATAMA", "HUMAIRA WARDHATULLAH MUHARROR", "HUMAIRAH ALYA NOVIYANTY", 
+                "JITA BIROU A'LIYA", "JIHAN SAKINAH AMALIYAH SYARIF", "JINGGA BALYANA ZAYYANI", 
+                "LATISHA CATHLEEN AULIA WIJAYA", "MALIKARSA SANCHEAL HERVANA", "MUTIARA FAKHIRA PUTRI UTOMO", 
+                "MYISHA AYUDIA KINASIH", "NADIA EZZATA SHANA", "NAJWA FATIMA AZZAHRA", "NAYLA SYIFA AZZAHRA HARIYADI", 
+                "NAYYARA KHANZA ARETHA", "PUTRI ARUNA CAHAYA RAMADHAN", "QONITA TALITHA SALSABILA", 
+                "RAIHAN D", "SABRINA KIRANA SALSABILA", "SAFIRA MUTIARA", "SYAKIRA PRAMESWARI", "WARDA ADEELA", "ZALFA NAILA"
+            ],
+            "9G": [
+                "AFIFA ADILA HUSNA", "AKIFA NAILA ANDANI", "ALYA ZAHRAN SAKKA", "ANIKA EL ZAHRA FATHONI", 
+                "AQILA SALSABILA FAIZA PUTRI P", "ATIQAH NUHA DZAHABIYYA LUZEN", "BHELGA BENING JUSTISYA", 
+                "BYASHA KENZIE", "DZALILA ALA", "NANDA KHAIRUNNISA", "CINTA BENING", "CLARABELLE ZAIITA", 
+                "DAVIKA CARLY", "DIVYA NAYLA", "DWI KUKUH", "FAIZUL EHLY", "FARAH AISYAH", "FARINDAA ALYA", 
+                "GENDIS ALEYA", "JANEETA ZHAFIRA", "KARTIKA PUTRI", "KEYLA SAFARA", "KHALILA ALMEIRA", 
+                "KHANSA NISA", "NATAFA", "NATASYA NAURA", "MAHESWARI", "NAURA", "NONA", "SITI KIRANA", "SYAHDA"
+            ],
+            "9J": [
+                "AHMAD YAFI ALIFUDIN", "ALIF SHAH HIZZA", "ALVITO SEPTIAN", "ANISAH ADIVYAH", "ARKA ZAIDAN", 
+                "ARYA BIMA", "ARYA TIRTA", "AZZALEA WAFIQ", "DZAKY ATHALLAH", "FANIDA KEISHA", "HITHAH FADILLAH", 
+                "OH FARDYA", "KIRANA", "LINTANG", "LOVIKA", "MAGA", "MAHER", "NAISYA", "MOCH. FIRMAN", 
+                "MOCH. NABIL", "MOCH. AHMAD", "MUHAMMAD AIDAN", "MUHAMMAD ALFAREZAL", "MUHAMMAD AMJAD", 
+                "MUHAMMAD AQIEL", "MUHAMMAD HAFIZ", "MUHAMMAD KHOIRUL", "MUHAMMAD RAIHAN", "MUHAMMAD RAVINDRA", 
+                "RAIHAN AKBAR", "RAZQA ZAVIER"
+            ],
+            "9K": [
+                "BELDA NAFISA", "ALIF", "ALWARD", "ANDI", "ARDAN", "ARYA", "AUNA", "AULINA", "AULIA", "BUNGA", 
+                "HAIDAR", "HILMI", "IHSAN", "IMADA", "KANZA", "KAYLA", "KHALID", "KHANSAA", "MUHAMMAD ALBY", 
+                "MUHAMMAD FABYZA", "MUHAMMAD FATHAN", "MUHAMMAD KAMIL", "MUHAMMAD RASHEESA", "MUHAMMAD RAYHAN", 
+                "NADHILA", "NAILA", "NANDRA", "QONITA", "PUTRI", "RAISA", "SALWA", "SOFINA"
+            ]
+        };
+
+        function updateDaftarNama() {
+            const kelasSelect = document.getElementById('presensi-kelas');
+            const namaSelect = document.getElementById('presensi-nama');
+            const selectedKelas = kelasSelect.value;
+            
+            namaSelect.innerHTML = '<option value="">-- Pilih Nama --</option>';
+            
+            if (selectedKelas && dataSiswa[selectedKelas]) {
+                dataSiswa[selectedKelas].forEach(nama => {
+                    let option = document.createElement('option');
+                    option.value = nama;
+                    option.textContent = nama;
+                    namaSelect.appendChild(option);
+                });
+                namaSelect.disabled = false;
+            } else {
+                namaSelect.disabled = true;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('presensi-tanggal').value = today;
+        });
+
+        document.getElementById('form-presensi').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const tanggal = document.getElementById('presensi-tanggal').value;
+            const kelas = document.getElementById('presensi-kelas').value;
+            const nama = document.getElementById('presensi-nama').value;
+            const status = document.querySelector('input[name="status-hadir"]:checked').value;
+            
+            const btnSubmit = this.querySelector('button[type="submit"]');
+            const originalText = btnSubmit.innerText;
+            btnSubmit.innerText = "Mengirim...";
+            btnSubmit.disabled = true;
+
+            const dataPresensi = { 
+                tanggal, 
+                kelas, 
+                nama, 
+                status, 
+                waktu: new Date().toLocaleString(),
+                timestamp: Date.now()
+            };
+
+            // Simpan ke online cloud, jika gagal baru simpan ke local storage
+            let isOnlineSaved = false;
+            if (window.saveDataOnline) {
+                isOnlineSaved = await window.saveDataOnline(dataPresensi);
+            }
+
+            if (!isOnlineSaved) {
+                let presensiArr = JSON.parse(localStorage.getItem('presensiIPA') || '[]');
+                presensiArr.push(dataPresensi);
+                localStorage.setItem('presensiIPA', JSON.stringify(presensiArr));
+            }
+            
+            btnSubmit.innerText = originalText;
+            btnSubmit.disabled = false;
+
+            const alertBox = document.getElementById('alert-presensi');
+            alertBox.classList.remove('hidden');
+            alertBox.classList.add('fade-in');
+            
+            this.reset();
+            document.getElementById('presensi-tanggal').value = tanggal; // Kembalikan tanggal
+            document.getElementById('presensi-kelas').value = kelas; // Kembalikan kelas
+            document.getElementById('presensi-nama').disabled = true;
+            
+            setTimeout(() => { alertBox.classList.add('hidden'); }, 3000);
+        });
+
+        // --- REKAP PRESENSI LOGIC ---
+        async function showRekap() {
+            const modal = document.getElementById('modal-rekap');
+            const tbody = document.getElementById('tbody-rekap');
+            modal.classList.remove('hidden');
+            tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500 font-bold">Mengambil data dari server... ⏳</td></tr>';
+            
+            let presensiArr = [];
+            if (window.getDataOnline) {
+                presensiArr = await window.getDataOnline();
+            }
+            
+            // Gabung dengan data lokal jika ada (untuk jaga-jaga offline)
+            const localData = JSON.parse(localStorage.getItem('presensiIPA') || '[]');
+            if (localData.length > 0) {
+                presensiArr = presensiArr.concat(localData.reverse());
+            }
+            
+            tbody.innerHTML = '';
+            if (presensiArr.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500">Belum ada data kehadiran siswa yang masuk.</td></tr>';
+            } else {
+                presensiArr.forEach(data => {
+                    let statusColor = '';
+                    if(data.status === 'Hadir') statusColor = 'text-green-600 bg-green-100 px-2 py-1 rounded';
+                    else if(data.status === 'Sakit') statusColor = 'text-yellow-700 bg-yellow-100 px-2 py-1 rounded';
+                    else if(data.status === 'Izin') statusColor = 'text-blue-600 bg-blue-100 px-2 py-1 rounded';
+                    else if(data.status === 'Alpa') statusColor = 'text-red-600 bg-red-100 px-2 py-1 rounded';
+                    else statusColor = 'text-purple-600 bg-purple-100 px-2 py-1 rounded';
+
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                            <td class="border border-gray-300 dark:border-gray-600 p-2 text-xs">${data.waktu}</td>
+                            <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">${data.tanggal}</td>
+                            <td class="border border-gray-300 dark:border-gray-600 p-2 text-center font-bold">${data.kelas}</td>
+                            <td class="border border-gray-300 dark:border-gray-600 p-2">${data.nama}</td>
+                            <td class="border border-gray-300 dark:border-gray-600 p-2 text-center font-bold"><span class="${statusColor}">${data.status}</span></td>
+                        </tr>
+                    `;
+                });
+            }
+        }
+
+        function closeRekap() {
+            document.getElementById('modal-rekap').classList.add('hidden');
+        }
+
+        async function clearRekap() {
+            if(confirm('PERINGATAN: Apakah Anda yakin ingin menghapus SEMUA data kehadiran (termasuk dari server)? Data yang dihapus tidak bisa dikembalikan.')) {
+                if (window.clearDataOnline) {
+                    await window.clearDataOnline();
+                }
+                localStorage.removeItem('presensiIPA');
+                alert("Data berhasil dihapus dari server dan perangkat ini.");
+                showRekap();
+            }
+        }
+
+        async function downloadCSV() {
+            let presensiArr = [];
+            if (window.getDataOnline) {
+                presensiArr = await window.getDataOnline();
+            }
+            
+            const localData = JSON.parse(localStorage.getItem('presensiIPA') || '[]');
+            if (localData.length > 0) {
+                presensiArr = presensiArr.concat(localData.reverse());
+            }
+
+            if (presensiArr.length === 0) {
+                alert('Tidak ada data untuk diunduh.');
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,Waktu Input,Tanggal,Kelas,Nama Siswa,Status\n";
+            presensiArr.forEach(row => {
+                csvContent += `"${row.waktu}","${row.tanggal}","${row.kelas}","${row.nama}","${row.status}"\n`;
+            });
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "Rekap_Kehadiran_IPA.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function toggleDarkMode() { document.documentElement.classList.toggle('dark'); }
+
+        function showSection(id) {
+            ['beranda', 'materi', 'lab', 'lkpd', 'kuis'].forEach(sec => {
+                document.getElementById(sec).classList.add('hidden');
+                document.getElementById(sec).classList.remove('block');
+            });
+            document.getElementById(id).classList.remove('hidden');
+            document.getElementById(id).classList.add('block');
+            document.getElementById('mobile-menu').classList.add('hidden');
+            
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-blue-100', 'text-primary', 'dark:bg-gray-800', 'dark:text-secondary');
+            });
+            
+            try {
+                if (event && event.currentTarget && event.currentTarget.classList) {
+                    event.currentTarget.classList.add('bg-blue-100', 'text-primary', 'dark:bg-gray-800', 'dark:text-secondary');
+                }
+            } catch(e) {}
+
+            if(id === 'lab') {
+                initLab();
+                updateCoulomb();
+            }
+        }
+
+        // --- LAB VIRTUAL TAB SWITCHER ---
+        function switchLab(labType) {
+            const btnBalon = document.getElementById('tab-balon');
+            const btnCoulomb = document.getElementById('tab-coulomb');
+            const conBalon = document.getElementById('lab-balon-container');
+            const conCoulomb = document.getElementById('lab-coulomb-container');
+
+            if (labType === 'balon') {
+                btnBalon.className = "bg-secondary text-white font-bold px-4 py-2 rounded-t-lg transition";
+                btnCoulomb.className = "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 font-bold px-4 py-2 rounded-t-lg transition";
+                conBalon.classList.remove('hidden');
+                conBalon.classList.add('block');
+                conCoulomb.classList.remove('block');
+                conCoulomb.classList.add('hidden');
+            } else {
+                btnCoulomb.className = "bg-secondary text-white font-bold px-4 py-2 rounded-t-lg transition";
+                btnBalon.className = "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 font-bold px-4 py-2 rounded-t-lg transition";
+                conCoulomb.classList.remove('hidden');
+                conCoulomb.classList.add('block');
+                conBalon.classList.remove('block');
+                conBalon.classList.add('hidden');
+                updateCoulomb();
+            }
+        }
+
+        // --- LAB VIRTUAL HUKUM COULOMB ---
+        function updateCoulomb() {
+            let q1 = parseFloat(document.getElementById('q1-slider').value);
+            let q2 = parseFloat(document.getElementById('q2-slider').value);
+            let r = parseFloat(document.getElementById('r-slider').value);
+
+            document.getElementById('q1-val').innerText = q1 + " μC";
+            document.getElementById('q2-val').innerText = q2 + " μC";
+            document.getElementById('r-val').innerText = r + " cm";
+
+            let con1 = document.getElementById('coulomb-q1-container');
+            let con2 = document.getElementById('coulomb-q2-container');
+            let obj1 = document.getElementById('coulomb-q1');
+            let obj2 = document.getElementById('coulomb-q2');
+            let line = document.getElementById('coulomb-distance-line');
+            
+            // Set Warna
+            obj1.className = `w-12 h-12 rounded-full flex items-center justify-center text-white font-bold shadow-lg z-10 text-sm ${q1 > 0 ? 'bg-red-500' : (q1 < 0 ? 'bg-blue-500' : 'bg-gray-500')}`;
+            obj2.className = `w-12 h-12 rounded-full flex items-center justify-center text-white font-bold shadow-lg z-10 text-sm ${q2 > 0 ? 'bg-red-500' : (q2 < 0 ? 'bg-blue-500' : 'bg-gray-500')}`;
+            
+            obj1.innerText = q1 > 0 ? "+" + q1 : q1;
+            obj2.innerText = q2 > 0 ? "+" + q2 : q2;
+
+            // Atur Visual Jarak
+            let visualR = r * 30; // 1cm = 30px
+            line.style.width = visualR + 'px';
+            line.style.left = `calc(50% - ${visualR/2}px)`;
+            
+            con1.style.left = `calc(50% - ${visualR/2}px - 24px)`;
+            con2.style.left = `calc(50% + ${visualR/2}px - 24px)`;
+
+            // Hitung Gaya F = k * |q1*q2| / r^2 (k = 9x10^9, dikonversi untuk display disederhanakan)
+            let force = 0;
+            if (r !== 0) force = Math.abs(90 * q1 * q2 / Math.pow(r, 2));
+            
+            document.getElementById('coulomb-force').innerText = force.toFixed(1) + " N";
+
+            let f1Left = document.getElementById('f1-arrow-left');
+            let f1Right = document.getElementById('f1-arrow-right');
+            let f2Left = document.getElementById('f2-arrow-left');
+            let f2Right = document.getElementById('f2-arrow-right');
+
+            f1Left.classList.add('hidden'); f1Right.classList.add('hidden');
+            f2Left.classList.add('hidden'); f2Right.classList.add('hidden');
+
+            if (q1 === 0 || q2 === 0) {
+                document.getElementById('coulomb-status').innerText = "Salah satu muatan netral (0), tidak ada gaya (F = 0).";
+            } else if ((q1 * q2) < 0) {
+                document.getElementById('coulomb-status').innerText = "Muatan berbeda jenis, saling Tarik-menarik.";
+                f1Right.classList.remove('hidden'); // q1 ditarik ke kanan
+                f2Left.classList.remove('hidden');  // q2 ditarik ke kiri
+            } else {
+                document.getElementById('coulomb-status').innerText = "Muatan sejenis, saling Tolak-menolak.";
+                f1Left.classList.remove('hidden');  // q1 ditolak ke kiri
+                f2Right.classList.remove('hidden'); // q2 ditolak ke kanan
+            }
+        }
+
+        // --- LKPD TAB SWITCHER ---
+        function switchLKPD(lkpdType) {
+            const btnBalon = document.getElementById('tab-lkpd-balon');
+            const btnCoulomb = document.getElementById('tab-lkpd-coulomb');
+            const conBalon = document.getElementById('lkpd-content-balon');
+            const conCoulomb = document.getElementById('lkpd-content-coulomb');
+
+            if (lkpdType === 'balon') {
+                btnBalon.className = "bg-secondary text-white font-bold px-4 py-2 rounded-t-lg transition";
+                btnCoulomb.className = "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 font-bold px-4 py-2 rounded-t-lg transition";
+                conBalon.classList.remove('hidden');
+                conBalon.classList.add('block', 'space-y-6');
+                conCoulomb.classList.remove('block', 'space-y-6');
+                conCoulomb.classList.add('hidden');
+            } else {
+                btnCoulomb.className = "bg-secondary text-white font-bold px-4 py-2 rounded-t-lg transition";
+                btnBalon.className = "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 font-bold px-4 py-2 rounded-t-lg transition";
+                conCoulomb.classList.remove('hidden');
+                conCoulomb.classList.add('block', 'space-y-6');
+                conBalon.classList.remove('block', 'space-y-6');
+                conBalon.classList.add('hidden');
+            }
+        }
+
+        // --- LAB VIRTUAL PHYSICS (BALON & SWEATER) ---
+        let balloon, sweater, wall;
+        let labInitialized = false;
+        let balloonElectrons = 0; 
+
+        let isDragging = false;
+        let balloonVx = 0;
+        let balloonVy = 0;
+        let physicsAnimationId;
+
+        function initLab() {
+            if(labInitialized) return;
+            balloon = document.getElementById('balloon');
+            sweater = document.getElementById('sweater');
+            wall = document.getElementById('wall');
+            
+            resetLab(); 
+            
+            let offsetX, offsetY;
+
+            balloon.addEventListener('mousedown', startDrag);
+            balloon.addEventListener('touchstart', startDrag, {passive: false});
+            
+            function startDrag(e) {
+                isDragging = true;
+                const rect = balloon.getBoundingClientRect();
+                const parentRect = document.getElementById('lab-area').getBoundingClientRect();
+                let clientX = e.clientX || e.touches[0].clientX;
+                let clientY = e.clientY || e.touches[0].clientY;
+                offsetX = clientX - rect.left;
+                offsetY = clientY - rect.top;
+            }
+
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('touchmove', drag, {passive: false});
+            
+            function drag(e) {
+                if (!isDragging) return;
+                e.preventDefault();
+                
+                // Hentikan momentum saat balon dipegang (drag)
+                balloonVx = 0;
+                balloonVy = 0;
+
+                let clientX = e.clientX || e.touches[0].clientX;
+                let clientY = e.clientY || e.touches[0].clientY;
+                
+                const parentRect = document.getElementById('lab-area').getBoundingClientRect();
+                let newX = clientX - parentRect.left - offsetX;
+                let newY = clientY - parentRect.top - offsetY;
+
+                newX = Math.max(0, Math.min(newX, parentRect.width - balloon.offsetWidth));
+                newY = Math.max(0, Math.min(newY, parentRect.height - balloon.offsetHeight));
+
+                balloon.style.left = newX + 'px';
+                balloon.style.top = newY + 'px';
+                
+                checkCollision();
+                checkWallProximity();
+            }
+
+            document.addEventListener('mouseup', () => { isDragging = false; });
+            document.addEventListener('touchend', () => { isDragging = false; });
+
+            labInitialized = true;
+            
+            // Mulai loop fisika
+            if (physicsAnimationId) cancelAnimationFrame(physicsAnimationId);
+            physicsLoop();
+        }
+
+        function physicsLoop() {
+            if (!isDragging && balloonElectrons > 0 && balloon.offsetParent !== null) {
+                let bRect = balloon.getBoundingClientRect();
+                let sRect = sweater.getBoundingClientRect();
+                let wRect = wall.getBoundingClientRect();
+                const parentRect = document.getElementById('lab-area').getBoundingClientRect();
+
+                let bCenterX = bRect.left + bRect.width / 2;
+                let bCenterY = bRect.top + bRect.height / 2;
+                let sCenterX = sRect.left + sRect.width / 2;
+                let sCenterY = sRect.top + sRect.height / 2;
+
+                let dx = sCenterX - bCenterX;
+                let dy = sCenterY - bCenterY;
+                let distToSweater = Math.sqrt(dx*dx + dy*dy);
+                let distToWall = wRect.left - bRect.right;
+
+                let forceX = 0;
+                let forceY = 0;
+
+                // Gaya tarik ke Sweater (Gaya Coulomb antara (+) sweater dan (-) balon)
+                if (distToSweater > 10) {
+                    let pull = 0.5 + (balloonElectrons * 0.05);
+                    forceX += (dx / distToSweater) * pull;
+                    forceY += (dy / distToSweater) * pull;
+                }
+
+                // Gaya tarik ke Dinding (Akibat polarisasi dinding jika cukup dekat)
+                if (balloonElectrons > 5 && distToWall > 0 && distToWall < 100) {
+                    let wallPull = 2 * (100 - distToWall) / 50; // Semakin dekat, tarikan semakin kuat
+                    forceX += wallPull; // Dinding ada di kanan, force ke sumbu X positif
+                    
+                    if (distToWall < 60) {
+                        forceX += wallPull * 2; // Tarikan dinding mengalahkan tarikan sweater
+                        balloonVy *= 0.5; // Redam pergerakan vertikal agar stabil menempel
+                    }
+                }
+
+                balloonVx += forceX;
+                balloonVy += forceY;
+
+                // Gesekan udara (Friction) agar gerakan tidak tak terbatas
+                balloonVx *= 0.85;
+                balloonVy *= 0.85;
+
+                let currentLeft = parseFloat(balloon.style.left) || 0;
+                let currentTop = parseFloat(balloon.style.top) || 0;
+
+                let newLeft = currentLeft + balloonVx;
+                let newTop = currentTop + balloonVy;
+
+                // Logika menempel presisi saat membentur dinding
+                if (distToWall <= 2 && forceX > 0 && balloonVx > 0) {
+                    newLeft = wRect.left - parentRect.left - balloon.offsetWidth;
+                    balloonVx = 0;
+                    document.getElementById('lab-status').innerText = `Status: Balon ditarik & menempel oleh proton (+) dinding!`;
+                } else if (distToSweater <= 20) {
+                    document.getElementById('lab-status').innerText = `Status: Balon ditarik ke sweater (Berbeda Muatan)!`;
+                }
+
+                // Batas box lab virtual
+                newLeft = Math.max(0, Math.min(newLeft, parentRect.width - balloon.offsetWidth));
+                newTop = Math.max(0, Math.min(newTop, parentRect.height - balloon.offsetHeight));
+
+                balloon.style.left = newLeft + 'px';
+                balloon.style.top = newTop + 'px';
+
+                checkWallProximity(); // Update animasi polarisasi dinding terus-menerus
+            }
+            physicsAnimationId = requestAnimationFrame(physicsLoop);
+        }
+
+        function createCharge(type, parent) {
+            let el = document.createElement('div');
+            el.className = `charge ${type}`;
+            el.innerHTML = type === 'proton' ? '+' : '-';
+            el.style.position = 'relative'; 
+            el.style.margin = '2px';
+            parent.appendChild(el);
+            return el;
+        }
+
+        function resetLab() {
+            balloon.innerHTML = '<div class="knot"></div>';
+            sweater.innerHTML = '<div class="absolute -top-6 text-xs font-bold text-gray-800 w-full text-center">Sweater Wol</div>';
+            wall.innerHTML = '<div class="absolute -top-6 text-xs font-bold text-gray-800 w-full text-center">Dinding</div>';
+            
+            balloon.style.left = '300px';
+            balloon.style.top = '150px';
+            balloonElectrons = 0;
+            balloonVx = 0;
+            balloonVy = 0;
+
+            for(let i=0; i<15; i++){
+                let pair = document.createElement('div');
+                pair.style.display = 'flex';
+                createCharge('proton', pair);
+                createCharge('electron', pair).classList.add('transferable');
+                sweater.appendChild(pair);
+            }
+
+            for(let i=0; i<4; i++){
+                let pair = document.createElement('div');
+                pair.style.display = 'flex';
+                createCharge('proton', pair);
+                createCharge('electron', pair);
+                balloon.appendChild(pair);
+            }
+
+            for(let i=0; i<8; i++){
+                let pair = document.createElement('div');
+                pair.style.display = 'flex';
+                pair.style.width = '100%';
+                pair.style.justifyContent = 'space-around';
+                createCharge('proton', pair);
+                let el = createCharge('electron', pair);
+                el.classList.add('wall-electron');
+                wall.appendChild(pair);
+            }
+            
+            document.getElementById('lab-status').innerText = "Status: Sweater dan Balon Netral";
+        }
+
+        function checkCollision() {
+            let bRect = balloon.getBoundingClientRect();
+            let sRect = sweater.getBoundingClientRect();
+            
+            if (!(bRect.right < sRect.left || bRect.left > sRect.right || bRect.bottom < sRect.top || bRect.top > sRect.bottom)) {
+                let electrons = sweater.querySelectorAll('.transferable');
+                if(electrons.length > 0) {
+                    let e = electrons[electrons.length - 1];
+                    e.classList.remove('transferable');
+                    e.style.position = 'absolute';
+                    
+                    e.style.left = (Math.random() * 60 + 10) + 'px';
+                    e.style.top = (Math.random() * 80 + 10) + 'px';
+                    balloon.appendChild(e);
+                    
+                    balloonElectrons++;
+                    document.getElementById('lab-status').innerText = `Status: Balon Bermuatan Negatif (Tarik ${balloonElectrons} elektron)`;
+                }
+            }
+        }
+
+        function checkWallProximity() {
+            let bRect = balloon.getBoundingClientRect();
+            let wRect = wall.getBoundingClientRect();
+            let distance = wRect.left - bRect.right;
+            
+            let wallElectrons = document.querySelectorAll('.wall-electron');
+            
+            if (balloonElectrons > 0 && distance < 150 && distance > -50) {
+                let repelDist = Math.max(0, 150 - distance) / 2; 
+                wallElectrons.forEach(e => {
+                    e.style.transform = `translateX(${repelDist}px)`;
+                });
+            } else {
+                wallElectrons.forEach(e => {
+                    e.style.transform = `translateX(0px)`;
+                });
+            }
+        }
+
+        // --- KUIS LOGIC ---
+        const quizData = [
+            { q: "Apa yang terjadi jika sisir plastik digosokkan ke rambut kering?", o: ["Proton berpindah dari sisir ke rambut", "Elektron berpindah dari rambut ke sisir", "Proton berpindah dari rambut ke sisir", "Elektron berpindah dari sisir ke rambut"], a: 1 },
+            { q: "Jika dua buah muatan yang sejenis didekatkan, maka yang terjadi adalah...", o: ["Tarik-menarik", "Tolak-menolak", "Tidak terjadi apa-apa", "Tarik-menarik lalu tolak-menolak"], a: 1 },
+            { q: "Alat pendeteksi muatan listrik pada suatu benda disebut...", o: ["Elektroskop", "Mikroskop", "Teleskop", "Amperemeter"], a: 0 }
+        ];
+        
+        let currentQ = 0;
+        let score = 0;
+        let timer;
+        let timeLeft = 60;
+
+        function startQuiz() {
+            document.getElementById('quiz-intro').classList.add('hidden');
+            document.getElementById('quiz-result').classList.add('hidden');
+            document.getElementById('quiz-play').classList.remove('hidden');
+            currentQ = 0;
+            score = 0;
+            timeLeft = 60;
+            loadQuestion();
+            timer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('quiz-timer').innerText = `Waktu: ${timeLeft}s`;
+                if(timeLeft <= 0) endQuiz();
+            }, 1000);
+        }
+
+        function loadQuestion() {
+            if(currentQ >= quizData.length) { endQuiz(); return; }
+            document.getElementById('quiz-progress').innerText = `Soal ${currentQ + 1} / ${quizData.length}`;
+            document.getElementById('question-text').innerText = quizData[currentQ].q;
+            
+            let optsHTML = '';
+            quizData[currentQ].o.forEach((opt, idx) => {
+                optsHTML += `<button onclick="answer(${idx})" class="w-full text-left p-3 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-blue-50 hover:border-secondary dark:hover:bg-gray-700 transition">${opt}</button>`;
+            });
+            document.getElementById('options-container').innerHTML = optsHTML;
+        }
+
+        function answer(idx) {
+            if(idx === quizData[currentQ].a) score++;
+            currentQ++;
+            loadQuestion();
+        }
+
+        function endQuiz() {
+            clearInterval(timer);
+            document.getElementById('quiz-play').classList.add('hidden');
+            document.getElementById('quiz-result').classList.remove('hidden');
+            document.getElementById('final-score').innerText = Math.round((score / quizData.length) * 100);
+        }
+
+        function updateLKPDKelas() {
+            const selectedKelas = document.getElementById('lkpd-kelas').value;
+            for(let i=1; i<=4; i++) {
+                const namaSelect = document.getElementById(`lkpd-nama-${i}`);
+                const noInput = document.getElementById(`lkpd-no-${i}`);
+                namaSelect.innerHTML = '<option value="">-- Pilih Nama --</option>';
+                noInput.value = '';
+                
+                if (selectedKelas && dataSiswa[selectedKelas]) {
+                    dataSiswa[selectedKelas].forEach((nama, index) => {
+                        let option = document.createElement('option');
+                        option.value = index; 
+                        option.textContent = nama;
+                        namaSelect.appendChild(option);
+                    });
+                    namaSelect.disabled = false;
+                } else {
+                    namaSelect.disabled = true;
+                }
+            }
+        }
+
+        function updateNoPresensi(memberIndex) {
+            const namaSelect = document.getElementById(`lkpd-nama-${memberIndex}`);
+            const noInput = document.getElementById(`lkpd-no-${memberIndex}`);
+            if (namaSelect.value !== "") {
+                noInput.value = parseInt(namaSelect.value) + 1; // Index 0 jadi presensi 1
+            } else {
+                noInput.value = '';
+            }
+        }
+
+        function printLKPD() {
+            document.querySelectorAll('#lkpd-section input, #lkpd-section textarea').forEach(el => {
+                if(el.tagName === 'INPUT') el.setAttribute('value', el.value);
+                if(el.tagName === 'TEXTAREA') el.innerHTML = el.value;
+            });
+            window.print();
+        }
+    </script>
+</body>
+</html>
